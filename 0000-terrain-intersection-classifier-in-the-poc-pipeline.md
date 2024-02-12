@@ -11,25 +11,26 @@
 
 [summary]: #summary
 
-Beacons and data sent over the IOT network do not propagate through significant terrain, such as mountains, or hills. Signals are generally only received if there is a clear line of sight between the transmitter and the receiver. This proposal adds a step to the Helium Proof of Coverage (PoC) pipeline to verify the line of sight between the asserted locations of hotspots and their witnesses. The witness reports will be marked as *invalid* if the line of sight is blocked and successful radio communication is unlikely between the beaconer and the witness.
+Beacon signals and data transmissions over the IoT network face significant propagation challenges across complex terrains, such as mountains or hills. Typically, effective signal reception occurs primarily when there's an unobstructed line of sight (LoS) between the transmitting and receiving devices. To enhance the integrity and reliability of the Helium Network's Proof of Coverage (PoC) process, this proposal introduces an additional verification step. This step aims to authenticate the line of sight between the declared locations of hotspots and their corresponding witnesses. Under this proposed mechanism, witness reports will be evaluated for LoS obstructions. Reports indicating a blocked LoS, which renders successful radio communication between the beaconer and the witness improbable, will be classified as *invalid*. This initiative is designed to improve network validation processes, ensuring that the PoC accurately reflects the physical and operational realities of radio communication.
 
 ## Motivation
 
 [motivation]: #motivation
 
-On January 13, 2022, the community [approved](https://github.com/helium/HIP/blob/main/0040-validator-denylist.md) that Nova Labs would be allowed to operate and enforce a [deny list](https://docs.helium.com/iot/denylist) to handle widespread abuse of the Helium Proof of Coverage (PoC) system. On [August](https://docs.helium.com/devblog/2023/08/07/denylist-evolution/) and [September](https://docs.helium.com/devblog/2023/09/14/denylist-refine/) of 2023, the deny list process is improved to have automated classifiers analyzing the PoC data to detect abusers.
+On January 13, 2022, the Helium community [approved](https://github.com/helium/HIP/blob/main/0040-validator-denylist.md) a proposal allowing Nova Labs to operate and enforce a [deny list](https://docs.helium.com/iot/denylist) aimed at addressing widespread abuse within the Helium Proof of Coverage (PoC) system. Subsequent enhancements in [August](https://docs.helium.com/devblog/2023/08/07/denylist-evolution/) and [September](https://docs.helium.com/devblog/2023/09/14/denylist-refine/) of 2023 introduced automated classifiers to the deny list process, analyzing PoC data to efficiently identify and mitigate abuse. 
 
-One of the classifiers used is the *Terrain Intersection Classifier*, which use the NASA Shuttle Radar Topography Mission (SRTM) [data](https://www2.jpl.nasa.gov/srtm/) and the hotspots' asserted location information to check the availability of clear line of sight (LoS). If the LoS is found to be blocked and successful radio communication is unlikely between the beaconer and the witness, the beaconer - witness pair is placed in the edge deny list, to mark their witness reports against each other as invalid with the reason of `denied_edge`. 
+One component of this enhanced system is the *Terrain Intersection Classifier*. Utilizing [data from the NASA Shuttle Radar Topography Mission](https://www2.jpl.nasa.gov/srtm/) (SRTM) alongside hotspots' asserted location information, this classifier assesses the presence of an unobstructed line of sight (LoS). When an obstructed LoS is detected, suggesting improbable successful radio communication between the beaconer and witness, the involved pair is added to the edge deny list. Their witness reports are marked as invalid due to `denied_edge`.
 
-The algorithm has already proven it maturity and its implementation is optimized heavily by Nova, allowing it to be ran in the PoC pipeline. With this proposal, this algorithm having a major impact on the PoC process will be moved to the PoC pipeline permanently, taking it into the regular governance model of Helium network. 
+Having demonstrated its effectiveness and after significant refinement by Nova Labs, this algorithm is ready for deployment in the PoC pipeline. The essence of this proposal is to formalize its role within the Helium network by ensuring its permanent place in the PoC process, aligning it with the network's governance protocols.
 
-While mostly automated, the deny list is still a weekly process governed by human review. This change will enable the process run fully automatically too.
+While the deny list process currently incorporates a blend of automation and weekly human reviews, this change proposes a shift towards full automation. Such a transition would streamline operations and have the PoC accurately reflects real-world communication capabilities.
+
 
 ## Stakeholders
 
 [stakeholders]: #stakeholders
 
-Hotspots owners, in particular those which already have denied edges with the `terrain_intersection` reason will be impacted by this proposal. There will be no change in terms of their rewards. The only change will be the reason of the invalid witness reports. Instead of `denied_edge`, the reason will be `terrain_intersection`.
+This proposal directly affects hotspot owners, especially those whose connections have previously been marked with denied edges due to `terrain_intersection`. It's important to note that there will be no alterations to their reward structure; the financial incentives remain unchanged. The sole modification introduced by this proposal pertains to the classification of invalid witness reports. Rather than being labeled as `denied_edge`, these instances will now be identified specifically by the `terrain_intersection` reason. This adjustment aims to provide greater transparency and specificity regarding the cause of denied witness interactions.
 
 ## Detailed Explanation
 
@@ -77,11 +78,11 @@ The main drawback of this proposal is that it increases the complexity of the `i
 
 [rationale-and-alternatives]: #rationale-and-alternatives
 
-The alternative to this solution is to maintain the status quo where an edge is added to the denylist. We think an automated system within the PoC pipeline is a better solution because,
+The current alternative to our proposed solution involves maintaining the existing practice, wherein edges subject to terrain obstructions are added to the denylist. However, integrating an automated system within the PoC pipeline presents a superior approach for several reasons:
 
-1. This will decrease the size of the edges deny list.
-2. The process will be fully automatized 
-3. A major algorithm having an impact on the PoC process will be take into the regular Helium governance model.
+1. **Reduction in Denylist Size**: By automating the identification and handling of terrain-obstructed connections directly within the PoC pipeline, we significantly decrease the volume of entries in the edges deny list. 
+2. **Full Automation**: Transitioning to a fully automated process eliminates manual intervention, ensuring a more efficient, consistent, and error-resistant operation. 
+3. **Incorporation into Helium Governance**: By integrating this major algorithm directly into the PoC pipeline, it becomes a part of the regular Helium network governance model. This shift ensures that critical components influencing the PoC process are managed under the network's established governance framework, promoting transparency and community oversight.
 
 ## Unresolved Questions
 
